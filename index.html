@@ -84,6 +84,29 @@
         }
     </style>
 </head>
+.btn-custom {
+  display: inline-block;
+  padding: 12px 24px;
+  background-color: #007bff; /* Колір фон кнопки (синій) */
+  color: #ffffff; /* Колір тексту */
+  font-family: sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none; /* Прибирає стандартне підкреслення посилання */
+  border-radius: 6px; /* Заокруглені кути */
+  transition: background-color 0.2s ease, transform 0.1s ease; /* Плавна анімація */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Легка тінь */
+}
+
+/* Ефект при наведенні миші */
+.btn-custom:hover {
+  background-color: #0056b3; /* Темніший відтінок синього */
+}
+
+/* Ефект при натисканні на кнопку */
+.btn-custom:active {
+  transform: scale(0.98); /* Легке зменшення кнопки */
+}
 <body class="min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
 
     <!-- Starfield Animated Background Canvas -->

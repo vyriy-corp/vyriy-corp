@@ -11,7 +11,7 @@
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
-    <!-- Google Fonts: Orbitron for Sci-Fi Headers, Rajdhani for Titles & Inter for Text -->
+    <!-- Google Fonts: Orbitron, Rajdhani & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
@@ -49,22 +49,58 @@
         
         .glass-panel {
             background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         
         .glass-panel-hover:hover {
-            border-color: rgba(0, 229, 255, 0.4);
-            box-shadow: 0 0 25px rgba(0, 229, 255, 0.15);
+            border-color: rgba(0, 229, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0, 229, 255, 0.2);
+            transform: translateY(-4px) scale(1.01);
         }
 
         .glow-text {
-            text-shadow: 0 0 12px rgba(0, 229, 255, 0.6);
+            text-shadow: 0 0 16px rgba(0, 229, 255, 0.7);
         }
 
         .glow-gold {
-            text-shadow: 0 0 12px rgba(212, 175, 55, 0.6);
+            text-shadow: 0 0 16px rgba(212, 175, 55, 0.7);
+        }
+
+        /* Keyframe Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.08); }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(24px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-float {
+            animation: float 5s ease-in-out infinite;
+        }
+
+        .animate-glow-pulse {
+            animation: pulseGlow 4s ease-in-out infinite;
+        }
+
+        .tab-enter {
+            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         /* Custom scrollbar */
@@ -85,13 +121,13 @@
 </head>
 <body class="min-h-screen flex flex-col justify-between relative selection:bg-cyan-500 selection:text-black">
 
-    <!-- Starfield Animated Background Canvas -->
-    <canvas id="spaceCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-60"></canvas>
+    <!-- Canvas background -->
+    <canvas id="spaceCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-70"></canvas>
 
-    <!-- Toast Notification Box -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+    <!-- Notification Toast -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none scale-90">
         <div class="glass-panel border-cyan-500/50 text-cyan-300 px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-            <i class="fa-solid fa-circle-check text-cyan-400"></i>
+            <i class="fa-solid fa-circle-check text-cyan-400 text-lg"></i>
             <span id="toastMsg" class="text-sm font-mono font-medium">Скопійовано!</span>
         </div>
     </div>
@@ -102,14 +138,14 @@
             <div class="flex items-center justify-between h-20">
                 
                 <!-- Logo -->
-                <div class="flex items-center gap-3 cursor-pointer" onclick="showTab('home')">
-                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-amber-500 p-0.5 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                <div class="flex items-center gap-3 cursor-pointer group" onclick="showTab('home')">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 to-amber-500 p-0.5 flex items-center justify-center shadow-lg shadow-cyan-500/20 group-hover:scale-110 group-hover:rotate-3 transition duration-300">
                         <div class="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
                             <span class="font-orbitron font-black text-amber-400 text-xl tracking-tighter">V</span>
                         </div>
                     </div>
                     <div>
-                        <span class="font-orbitron font-bold text-xl tracking-wider text-white flex items-center gap-2">
+                        <span class="font-orbitron font-bold text-xl tracking-wider text-white flex items-center gap-2 group-hover:text-cyan-400 transition">
                             VYRIY <span class="text-xs px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-md font-mono">VYR</span>
                         </span>
                         <span class="block text-[10px] font-mono text-slate-400 uppercase tracking-widest">EVE Online Ukrainian Corp</span>
@@ -118,52 +154,58 @@
 
                 <!-- Desktop Navigation Links -->
                 <nav class="hidden lg:flex items-center space-x-1 text-sm font-rajdhani font-semibold">
-                    <button id="nav-home" onclick="showTab('home')" class="nav-btn px-4 py-2 rounded-lg text-cyan-400 hover:text-cyan-300 hover:bg-slate-800/50 transition">
+                    <button id="nav-home" onclick="showTab('home')" class="nav-btn px-3 py-2 rounded-lg text-cyan-400 hover:text-cyan-300 hover:bg-slate-800/50 transition">
                         <i class="fa-solid fa-space-shuttle mr-1.5"></i> Головна
                     </button>
-                    <button id="nav-community" onclick="showTab('community')" class="nav-btn px-4 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
+                    <button id="nav-community" onclick="showTab('community')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
                         <i class="fa-solid fa-bullseye mr-1.5"></i> Мета & Цілі
                     </button>
-                    <button id="nav-watermelons" onclick="showTab('watermelons')" class="nav-btn px-4 py-2 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-500/10 transition group">
-                        <span class="mr-1 group-hover:scale-125 inline-block transition">🍉</span> Space Watermelons
+                    <a href="https://statut-vyriy.netlify.app/" target="_blank" class="px-3 py-2 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-amber-500/10 transition flex items-center gap-1.5 border border-amber-500/20 hover:border-amber-500/50">
+                        <i class="fa-solid fa-book-bookmark text-xs"></i> Статут
+                    </a>
+                    <button id="nav-watermelons" onclick="showTab('watermelons')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-500/10 transition group">
+                        <span class="mr-1 group-hover:rotate-12 inline-block transition">🍉</span> Watermelons
                     </button>
-                    <button id="nav-academy" onclick="showTab('academy')" class="nav-btn px-4 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
+                    <button id="nav-academy" onclick="showTab('academy')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
                         <i class="fa-solid fa-graduation-cap mr-1.5"></i> Vyriy Scout
                     </button>
-                    <button id="nav-ai" onclick="showTab('ai')" class="nav-btn px-4 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
+                    <button id="nav-ai" onclick="showTab('ai')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
                         <i class="fa-solid fa-brain mr-1.5 text-cyan-400"></i> AI Асистент
                     </button>
-                    <button id="nav-links" onclick="showTab('links')" class="nav-btn px-4 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
+                    <button id="nav-links" onclick="showTab('links')" class="nav-btn px-3 py-2 rounded-lg text-slate-300 hover:text-cyan-300 hover:bg-slate-800/50 transition">
                         <i class="fa-solid fa-link mr-1.5"></i> Ресурси
                     </button>
                 </nav>
 
                 <!-- Discord & CTA Button -->
                 <div class="hidden sm:flex items-center gap-3">
-                    <button onclick="showTab('apply')" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-orbitron font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-lg shadow-cyan-500/20 uppercase tracking-wider">
+                    <button onclick="showTab('apply')" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 hover:scale-105 active:scale-95 text-slate-950 font-orbitron font-bold text-xs px-5 py-2.5 rounded-xl transition shadow-lg shadow-cyan-500/25 uppercase tracking-wider">
                         Подати анкету
                     </button>
-                    <a href="http://discord.gg/3P2xTew5fD" target="_blank" class="glass-panel hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-indigo-500/10" title="Discord Сервер">
+                    <a href="http://discord.gg/3P2xTew5fD" target="_blank" class="glass-panel hover:bg-indigo-600/20 text-indigo-400 border border-indigo-500/40 hover:border-indigo-400 px-4 py-2.5 rounded-xl text-sm transition flex items-center gap-2 shadow-lg shadow-indigo-500/10 hover:scale-105">
                         <i class="fa-brands fa-discord text-base"></i>
                         <span class="font-rajdhani font-bold">Discord</span>
                     </a>
                 </div>
 
-                <!-- Mobile menu toggle -->
-                <button onclick="toggleMobileMenu()" class="lg:hidden text-slate-300 hover:text-white text-xl p-2">
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileMenu()" class="lg:hidden text-slate-300 hover:text-white text-xl p-2 transition">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
         <!-- Mobile Menu Dropdown -->
-        <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-800 bg-slate-950/95 px-4 pt-3 pb-6 space-y-2">
+        <div id="mobileMenu" class="hidden lg:hidden border-t border-slate-800 bg-slate-950/95 px-4 pt-3 pb-6 space-y-2 transition-all duration-300">
             <button onclick="showTab('home'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 font-rajdhani font-semibold">
                 <i class="fa-solid fa-space-shuttle mr-2 text-cyan-400"></i> Головна
             </button>
             <button onclick="showTab('community'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 font-rajdhani font-semibold">
                 <i class="fa-solid fa-bullseye mr-2 text-cyan-400"></i> Мета & Цілі
             </button>
+            <a href="https://statut-vyriy.netlify.app/" target="_blank" class="block w-full text-left px-4 py-2.5 rounded-lg text-amber-400 hover:bg-slate-800 font-rajdhani font-semibold">
+                <i class="fa-solid fa-book-bookmark mr-2"></i> Офіційний Статут Корпорації ↗
+            </a>
             <button onclick="showTab('watermelons'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-amber-400 hover:bg-slate-800 font-rajdhani font-semibold">
                 🍉 Space Watermelons (WH)
             </button>
@@ -171,12 +213,113 @@
                 <i class="fa-solid fa-graduation-cap mr-2 text-amber-400"></i> Vyriy Scout Corp
             </button>
             <button onclick="showTab('ai'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-cyan-400 hover:bg-slate-800 font-rajdhani font-semibold">
-                <i class="fa-solid fa-brain mr-2 text-cyan-400"></i> AI Асистент & Генератор
+                <i class="fa-solid fa-brain mr-2 text-cyan-400"></i> AI Асистент
             </button>
             <button onclick="showTab('links'); toggleMobileMenu();" class="w-full text-left px-4 py-2.5 rounded-lg text-slate-200 hover:bg-slate-800 font-rajdhani font-semibold">
                 <i class="fa-solid fa-link mr-2 text-cyan-400"></i> Ресурси
             </button>
-            <a href="http://discord.gg/3P2xTew5fD" target="_blank" class="block w-full text-center mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-orbitron font-bold py-3 rounded-xl transition uppercase tracking-wider text-xs">
+            <a href="http://discord.gg/3P2xTew5fD" target="_blank" class="block w-full text-center mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-orbitron font-bold py-3 rounded-xl transition uppercase tracking-wider text-xs shadow-lg shadow-indigo-600/30">
+                <i class="fa-brands fa-discord mr-2"></i> Приєднатися до Discord
+            </a>
+            <button onclick="showTab('apply'); toggleMobileMenu();" class="w-full text-center mt-2 bg-cyan-500 text-slate-950 font-orbitron font-bold py-3 rounded-xl uppercase tracking-wider text-xs shadow-lg shadow-cyan-500/30">
+                Подати анкету
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10 flex-grow">
+
+        <!-- TAB 1: HOME PAGE -->
+        <section id="tab-home" class="tab-content space-y-16 tab-enter">
+            
+            <!-- Hero Section -->
+            <div class="relative rounded-3xl p-8 sm:p-12 lg:p-16 overflow-hidden glass-panel border border-slate-800/80 shadow-2xl">
+                <div class="absolute -right-20 -top-20 w-96 h-96 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none animate-glow-pulse"></div>
+                <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none animate-glow-pulse" style="animation-delay: 2s;"></div>
+
+                <div class="max-w-3xl relative z-10">
+                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 rounded-full text-xs font-mono uppercase tracking-widest mb-6 backdrop-blur-md">
+                        <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                        Українська спільнота EVE Online
+                    </div>
+
+                    <h1 class="text-4xl sm:text-6xl font-orbitron font-black text-white leading-tight tracking-wide mb-6">
+                        VYRIY <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-amber-100 glow-gold">[VYRI]</span>
+                    </h1>
+
+                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed mb-8 font-sans">
+                        Україномовна корпорація в EVE Online. Ми об'єднуємо як досвідчених капітанів, так і пілотів-початківців. Працюємо у Null-Sec просторі, маємо власний Wormhole підрозділ <strong class="text-amber-400">Space Watermelons</strong> та навчальну академію <strong class="text-cyan-400">Vyriy Scout Corporation</strong>.
+                    </p>
+
+                    <div class="flex flex-wrap gap-4">
+                        <button onclick="showTab('apply')" class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 hover:scale-105 active:scale-95 text-slate-950 font-orbitron font-bold px-7 py-4 rounded-xl transition duration-300 shadow-xl shadow-cyan-500/25 uppercase tracking-wider text-sm flex items-center gap-2 group">
+                            <span>Вступити до лав</span>
+                            <i class="fa-solid fa-chevron-right text-xs group-hover:translate-x-1 transition"></i>
+                        </button>
+                        
+                        <a href="https://statut-vyriy.netlify.app/" target="_blank" class="glass-panel hover:bg-amber-500/20 text-amber-300 font-orbitron font-bold px-7 py-4 rounded-xl transition duration-300 border border-amber-500/40 hover:border-amber-400 hover:scale-105 flex items-center gap-2 shadow-lg shadow-amber-500/10 text-sm">
+                            <i class="fa-solid fa-scroll text-amber-400"></i>
+                            <span>Статут Корпорації</span>
+                            <i class="fa-solid fa-arrow-up-right-from-square text-xs opacity-70"></i>
+                        </a>
+
+                        <a href="http://discord.gg/3P2xTew5fD" target="_blank" class="bg-indigo-600 hover:bg-indigo-500 hover:scale-105 active:scale-95 text-white font-orbitron font-bold px-7 py-4 rounded-xl transition duration-300 shadow-xl shadow-indigo-500/25 uppercase tracking-wider text-sm flex items-center gap-2">
+                            <i class="fa-brands fa-discord"></i>
+                            <span>Discord</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl text-center">
+                    <span class="block font-orbitron font-black text-3xl text-cyan-400 glow-text">100%</span>
+                    <span class="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1 block">UA Спільнота</span>
+                </div>
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl text-center">
+                    <span class="block font-orbitron font-black text-3xl text-amber-400 glow-gold">Null & WH</span>
+                    <span class="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1 block">Базування</span>
+                </div>
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl text-center">
+                    <span class="block font-orbitron font-black text-3xl text-emerald-400">SRP</span>
+                    <span class="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1 block">Компенсація втрат</span>
+                </div>
+                <div class="glass-panel glass-panel-hover p-6 rounded-2xl text-center">
+                    <span class="block font-orbitron font-black text-3xl text-purple-400">24/7</span>
+                    <span class="text-xs text-slate-400 font-mono uppercase tracking-wider mt-1 block">Підтримка & Ментори</span>
+                </div>
+            </div>
+
+            <!-- Divisions -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div onclick="showTab('community')" class="glass-panel glass-panel-hover p-8 rounded-2xl cursor-pointer transition group">
+                    <div class="w-14 h-14 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition duration-300">
+                        🤝
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold text-white mb-3 group-hover:text-cyan-400 transition">Дружня спільнота</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                        Адекватна та взаємодопоміжна атмосфера. Наш головний пріоритет — задоволення від гри та якісне спілкування без токсичності.
+                    </p>
+                    <span class="text-cyan-400 text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-2 transition">
+                        Читати цілі та принципи →
+                    </span>
+                </div>
+
+                <div onclick="showTab('watermelons')" class="glass-panel glass-panel-hover p-8 rounded-2xl cursor-pointer transition group border-amber-500/30 hover:border-amber-400">
+                    <div class="w-14 h-14 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/30 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 group-hover:rotate-6 transition duration-300">
+                        🌌
+                    </div>
+                    <h3 class="text-2xl font-orbitron font-bold text-amber-400 mb-3 group-hover:text-amber-300 transition">Space Watermelons</h3>
+                    <p class="text-slate-400 text-sm leading-relaxed mb-4">
+                        Альт-корпорація та Wormhole підрозділ. Базуємося в червоточинах (J-space), проводимо сканінг, видобуток газу та WH-PvP.
+                    </p>
+                    <span class="text-amber-400 text-xs font-rajdhani font-bold uppercase tracking-wider flex items-center gap-1 group-hover:translate-x-2 transition">
+                        Детальніше про поділ →
+                    </span>
+                </div>
+
+                <div onclick="showTab('academy')" class="glass-panel glass-panel-hover p-8 rounded-2xl cursor-pointer transitioll text-center mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-orbitron font-bold py-3 rounded-xl transition uppercase tracking-wider text-xs">
                 <i class="fa-brands fa-discord mr-2"></i> Приєднатися до Discord
             </a>
             <button onclick="showTab('apply'); toggleMobileMenu();" class="w-full text-center mt-2 bg-cyan-500 text-slate-950 font-orbitron font-bold py-3 rounded-xl uppercase tracking-wider text-xs">
